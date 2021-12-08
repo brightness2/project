@@ -23,11 +23,13 @@ class Auth
         $except = config('middleware.except.checkAuth'); //排除的操作
         if (!in_array($action, $except)) {
             $uid = $GLOBALS['USER']->uid;
-
-            $auth = WenhainanAuth::instance();
-            if (!$auth->check($action, $uid)) {
-                throw new ZException('你没有该权限',null,401);
+            if($uid !== 'PM0001'){// PM0001 是超级管理员，不进行权限校验
+                $auth = WenhainanAuth::instance();
+                if (!$auth->check($action, $uid)) {
+                    throw new ZException('你没有该权限',null,401);
+                }
             }
+            
         }
 
         //执行响应

@@ -5,7 +5,8 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
+      v-permission="['dept/add']" @click="handleCreate">
         新增
       </el-button>
     </div>
@@ -39,12 +40,13 @@
           <span>{{ row.dt_memo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width"
+      v-if="checkPermission(['dept/edit','dept/delete'])">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" v-permission="['dept/edit']" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" v-permission="['dept/delete']" @click="handleDelete(row,$index)">
             删除
           </el-button>
         </template>
@@ -85,10 +87,12 @@
 import { fetchList,createDept,updateDept,deleteDept,getTotal} from '@/api/dept'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import checkPermission from '@/utils/permission' // 权限判断函数
+import permission from '@/directive/permission/index.js' // 权限判断指令
 export default {
   name: 'Department',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves,permission },
   data() {
     return {
       tableKey: 0,
@@ -204,7 +208,8 @@ export default {
                   this.getTotal();
             })
           })
-    },  
+    }, 
+    checkPermission, 
   }
 }
 </script>

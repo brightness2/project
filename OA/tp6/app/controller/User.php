@@ -6,7 +6,6 @@ use app\BaseController;
 use app\lib\exception\ZException;
 use app\model\AuthGroupAccess;
 use app\model\User as ModelUser;
-use think\wenhainan\Auth;
 
 class User extends BaseController
 {
@@ -97,5 +96,5 @@ class User extends BaseController
       return show($rs,"更新成功");
 
     }
-   
+
 }

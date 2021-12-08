@@ -12,7 +12,8 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
+      v-permission="['user/add']" @click="handleCreate">
         新增
       </el-button>
     </div>
@@ -48,15 +49,17 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width"
+      v-if="checkPermission(['user/setgroup','user/edit','user/delete'])"
+      >
         <template slot-scope="{row,$index}">
-           <el-button type="warning" size="mini" @click="handleGroup(row)">
+           <el-button type="warning" size="mini" v-permission="['user/setgroup']" @click="handleGroup(row)">
             设置分组
           </el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" v-permission="['user/edit']" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" v-permission="['user/delete']" @click="handleDelete(row,$index)">
             删除
           </el-button>
         </template>
@@ -120,10 +123,13 @@ import { fetchList,createUser,updateUser,deleteUser,getTotal,getUser,getGroupByU
 import {fetchList as fetchGroupList} from '@/api/group'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import checkPermission from '@/utils/permission' // 权限判断函数
+import permission from '@/directive/permission/index.js' // 权限判断指令
+
 export default {
   name: 'User',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves,permission},
   data() {
     return {
       tableKey: 0,
@@ -174,7 +180,9 @@ export default {
   created() {
     this.getTotal()
     this.getList()
-    this.getGroupList()
+    if(checkPermission(['user/setgroup'])){
+      this.getGroupList();
+    }
   },
   methods: {
     getTotal(){
@@ -278,7 +286,9 @@ export default {
       setGroup(this.temp.user_id,groups).then(response=>{
         this.groupVisible = false;
       })
-    }
+    },
+    checkPermission,
+
   }
 }
 </script>

@@ -3,6 +3,7 @@
 namespace app\controller;
 
 use app\BaseController;
+use app\lib\domain\Tools;
 use app\model\AuthRule;
 
 class Permission extends BaseController
@@ -18,7 +19,9 @@ class Permission extends BaseController
     {
       $searchParam = $this->request->param(['limit','page']);
       $list =   AuthRule::getList($searchParam);
-      return show($list);
+      $list = $list->toArray();
+      $tree = Tools::list_to_tree($list,'id','pid');
+      return show($tree);
     }
 
 

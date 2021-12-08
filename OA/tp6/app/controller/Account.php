@@ -5,8 +5,9 @@ namespace app\controller;
 use app\BaseController;
 use app\lib\domain\JWT;
 use app\lib\exception\ZException;
+use app\model\AuthRule;
 use app\model\User;
-
+use think\wenhainan\Auth as WenhainanAuth;
 class Account extends BaseController
 {
     
@@ -37,12 +38,23 @@ class Account extends BaseController
 
     public function info()
     {
-      $row = User::find($GLOBALS['USER']->uid);
+      $uid = $GLOBALS['USER']->uid;
+      $row = User::find($uid);
       if(!$row){
         throw new ZException("账号不存在，请重新登录",403);
       }
-      $row['roles'] = ['editor'];
+      $list = [];
+      if($uid === 'PM0001'){
+        $rows = AuthRule::column(['name']);
+        foreach($rows as $item){
+          $list[] =strtolower($item);
+        }
+      }else{
+        $auth = WenhainanAuth::instance();
+        $list = $auth->getAuthList($uid,1);
+      }
+     
+      $row['roles'] = $list;
       return show($row->hidden(['password']));
     }
-
 }

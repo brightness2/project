@@ -45,6 +45,6 @@ return [
     //路由中间件
     'middleware' => [
         'checkToken',
-        // 'checkAuth',
+        'checkAuth',
     ],
 ];

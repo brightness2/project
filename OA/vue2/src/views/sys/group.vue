@@ -5,7 +5,8 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
+      v-permission="['group/add']" @click="handleCreate">
         新增
       </el-button>
     </div>
@@ -36,15 +37,16 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width"
+       v-if="checkPermission(['group/setrules','group/edit','group/delete'])">
         <template slot-scope="{row,$index}">
-          <el-button type="warning" size="mini" @click="handlePermission(row)">
+          <el-button type="warning" size="mini" v-permission="['group/setrules']" @click="handlePermission(row)">
             设置权限
           </el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" v-permission="['group/edit']" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" v-permission="['group/delete']" @click="handleDelete(row,$index)">
             删除
           </el-button>
         </template>
@@ -70,7 +72,7 @@
       </div>
     </el-dialog>
 
-  <el-dialog :visible.sync="premissionVisible" :title="'设置权限'" :close-on-click-modal="false">
+  <el-dialog :visible.sync="premissionVisible" :title="'设置权限'" :close-on-click-modal="false" @close="handleClose">
       <el-form :model="temp" label-width="80px" label-position="left" >
         <el-input v-model="temp.id" type="hidden"/>
         <el-form-item label="分组名称">
@@ -82,7 +84,7 @@
             :check-strictly="false"
             :data="permissionData"
             :props="defaultProps"
-            show-checkbox
+            :show-checkbox="true"
             node-key="id"
             class="permission-tree"
           />
@@ -102,10 +104,13 @@ import { fetchList,createGroup,updateGroup,deleteGroup,getTotal,fetchPermissionL
 
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import checkPermission from '@/utils/permission' // 权限判断函数
+import permission from '@/directive/permission/index.js' // 权限判断指令
+
 export default {
   name: 'Group',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves,permission },
   data() {
     return {
       tableKey: 0,
@@ -224,23 +229,36 @@ export default {
       })
       
     },
+    handleClose(){
+      this.$refs.tree.setCheckedKeys([]);
+    },
     handlePermission(row){
       this.premissionVisible = true;
       this.temp = row;
       this.$nextTick(() => {
         getPermissionByGroup(row.id).then(response=>{
-          this.$refs.tree.setCheckedKeys(response.data);
+          for (const key in response.data) {
+            if (Object.hasOwnProperty.call(response.data, key)) {
+              const node = response.data[key];
+              this.$refs.tree.setChecked(node,true);
+            }
+          }
         })
       }) 
       
     },
     setPermiss(){
-          let rules = this.$refs.tree.getCheckedKeys();
-          setPermission(this.temp.id,rules).then(response=>{
+          let rules = this.$refs.tree.getCheckedNodes(false,true);
+          let ids = [];
+          for(let i in rules){
+            ids.push(rules[i].id)
+          }
+          setPermission(this.temp.id,ids).then(response=>{
             this.premissionVisible=false;
           })
       
-    }
+    },
+    checkPermission,
   }
 }
 </script>

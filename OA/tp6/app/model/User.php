@@ -4,6 +4,7 @@ namespace app\model;
 use app\lib\exception\ZException;
 use app\lib\model\Zmodel;
 
+
 class User extends Zmodel{
 
     protected $SeqName = 'user'; //计数序列
@@ -62,7 +63,6 @@ class User extends Zmodel{
         }
         return $row->save(['password'=>encryptPwd($pwd)]);
     }
-
 
     /*******搜索器*** */
 

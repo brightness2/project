@@ -22,6 +22,19 @@ return [
             'Account/info',
             'Account/logout',
             'Index/index',
+            // 
+            // 'Group/getTotal',
+            // 'Group/getList',
+            // 'Group/get',
+            // 'Group/add',
+            // 'Group/edit',
+            // 'Group/delete',
+            // 'Group/setRules',
+            // 'Group/getRules',
+            'Permission/getTotal',
+            'Permission/getList',
+            
+
         ],
     ],
 

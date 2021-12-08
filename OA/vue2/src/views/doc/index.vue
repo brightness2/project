@@ -30,7 +30,8 @@
                 <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
                   搜索
                 </el-button>
-                <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-upload" @click="handleCreate">
+                <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-upload" 
+                v-permission="['doc/upload']" @click="handleCreate">
                   上传文件
                 </el-button>
               </div>
@@ -61,10 +62,11 @@
                   
                   <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
                     <template slot-scope="{row,$index}">
-                      <el-button type="primary" size="mini" @click="handleDownload(row)">
+                      <el-button type="primary" size="mini" v-permission="['doc/download']" @click="handleDownload(row)">
                         下载
                       </el-button>
-                      <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+                      <el-button v-if="row.status!='deleted'" size="mini" type="danger"
+                      v-permission="['doc/delete']" @click="handleDelete(row,$index)">
                         删除
                       </el-button>
                     </template>
@@ -95,9 +97,13 @@
 import {fetchDocList,fetchCateTree,getDocTotal,downloadDoc,deleteDoc} from '@/api/doc'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Dropzone from '@/components/Dropzone'
+import permission from '@/directive/permission/index.js' // 权限判断指令
+import checkPermission from '@/utils/permission' // 权限判断函数
+
 export default {
   name: 'Doc',
   components: { Pagination,Dropzone },
+  directives: { permission },
 
   data() {
     return {
@@ -209,6 +215,8 @@ export default {
       }
       
     },
+    checkPermission,
+
     
   }
 
